@@ -1,0 +1,36 @@
+{
+  "name": "@lego/core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/bundle.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node webpack.config.js & tsc --rootDir src --emitDeclarationOnly --outDir dist --watch & wait"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/runtime": "^7.10.4",
+    "react-redux": "^7.2.0",
+    "redux": "^4.0.5"
+  },
+  "peerDependencies": {
+    "react": "^16.13.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.4",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/preset-react": "^7.10.4",
+    "@babel/preset-typescript": "^7.10.4",
+    "@types/react": "^16.9.41",
+    "@types/react-redux": "^7.1.9",
+    "@types/webpack": "^4.41.19",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-import": "^1.13.0",
+    "webpack": "^4.43.0"
+  }
+}

@@ -1,0 +1,24 @@
+.lego-dev {
+  display: flex;
+  height: 100%;
+  .lego-dev-container {
+    flex: 1 1 auto;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    overflow: auto;
+    position: relative;
+    iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      height: 100%;
+      width: 100%;
+    }
+  }
+  .module-tree {
+    height: 100%;
+    padding: 10px;
+    min-width: 200px;
+  }
+}
