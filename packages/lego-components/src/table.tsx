@@ -34,7 +34,7 @@ export function LegoTable(props: LegoProps<TableProps>) {
   props.on("list", (data) => {
     setData(data);
   });
-  return <Table columns={columns} dataSource={data} />;
+  return <Table className={props.id} columns={columns} dataSource={data} />;
 }
 register({
   type: "lego-table",

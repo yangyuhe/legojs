@@ -6,10 +6,11 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import Store from "./redux/store";
 import { Action } from "./redux/action";
 
+export const DevContext = React.createContext(null);
 function LegoDev(props: { configs: ModuleConfig[] }) {
   let embed = location.hash == "#embed";
   if (embed) {
-    return <Embed configs={props.configs} />;
+    return <Embed />;
   } else {
     const dispatch = useDispatch();
     const configs: ModuleConfig[] = useSelector(
@@ -20,9 +21,12 @@ function LegoDev(props: { configs: ModuleConfig[] }) {
       dispatch({ type: Action.INIT_CONFIG, payload: initConfig });
     }, []);
 
+    const postMessage = (msg: { type: string; value: any }) => {
+      iframe.current.contentWindow.postMessage(msg);
+    };
     useEffect(() => {
       if (configs) {
-        iframe.current.contentWindow.postMessage({
+        postMessage({
           type: "lego_change",
           value: JSON.parse(JSON.stringify(configs)),
         });
@@ -53,27 +57,87 @@ function LegoDev(props: { configs: ModuleConfig[] }) {
         window.removeEventListener("resize", cacluIFrame);
       };
     }, []);
+    const onIFrameLoad = () => {
+      iframe.current.contentWindow.postMessage({
+        type: "lego_change",
+        value: JSON.parse(JSON.stringify(configs)),
+      });
+    };
 
     return (
-      <div className="lego-dev">
-        <Console />
-        <div ref={container} className="lego-dev-container">
-          <iframe ref={iframe} frameBorder="none" src="/#embed"></iframe>
+      <DevContext.Provider value={{ postMessage }}>
+        <div className="lego-dev">
+          <Console />
+          <div ref={container} className="lego-dev-container">
+            <iframe
+              onLoad={onIFrameLoad}
+              ref={iframe}
+              frameBorder="none"
+              src="/#embed"
+            ></iframe>
+          </div>
         </div>
-      </div>
+      </DevContext.Provider>
     );
   }
 }
-function Embed(props: { configs: ModuleConfig[] }) {
-  let [configs, setConfigs] = useState(props.configs);
+function Embed() {
+  let [configs, setConfigs] = useState([]);
   useEffect(() => {
+    let cbs = [];
     window.addEventListener("message", (evt) => {
       if (evt.data && evt.data.type === "lego_change") {
         setConfigs(evt.data.value);
       }
+      if (evt.data && evt.data.type === "lego_tree_focus") {
+        let moduleDoms = document.querySelectorAll(".lego-class");
+        cbs = [].slice
+          .call(moduleDoms, 0)
+          .filter((dom) => {
+            return [].slice
+              .call(dom.classList, 0)
+              .find(
+                (name) =>
+                  name == evt.data.value ||
+                  name.startsWith(evt.data.value + "-")
+              );
+          })
+          .map((dom) => {
+            let { left, top } = getPos(dom);
+            let div = document.createElement("div");
+            div.style.position = "fixed";
+            div.style.left = left + "px";
+            div.style.top = top + "px";
+            div.style.width = dom.offsetWidth + "px";
+            div.style.height = dom.offsetHeight + "px";
+            div.style.background = "rgba(40,120,201,0.5)";
+            document.body.append(div);
+            return () => {
+              div.remove();
+            };
+          });
+      }
+      if (evt.data && evt.data.type === "lego_tree_blur") {
+        cbs.forEach((cb) => cb());
+      }
     });
   }, []);
   return configs ? <Lego config={configs}></Lego> : null;
+}
+function getPos(dom: HTMLElement) {
+  let top = dom.offsetTop;
+  let cur = dom;
+  while (cur.offsetParent) {
+    cur = cur.offsetParent as HTMLElement;
+    top += cur.offsetTop;
+  }
+  let left = dom.offsetLeft;
+  cur = dom;
+  while (cur.offsetParent) {
+    cur = cur.offsetParent as HTMLElement;
+    top += cur.offsetLeft;
+  }
+  return { left, top };
 }
 export default function Wrapper(props) {
   return (

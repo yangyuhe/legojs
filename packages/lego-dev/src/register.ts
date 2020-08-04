@@ -4,7 +4,9 @@ let descriptions: { [type: string]: string } = {};
  * @param des type是模块类型，des是模块的描述
  */
 export function describeModule(
-  des: { type: string; des: string } | { type: string; des: string }[]
+  des:
+    | { type: string; des: string; constructor: any }
+    | { type: string; des: string; constructor: any }[]
 ) {
   if (!Array.isArray(des)) des = [des];
   des.forEach((item) => {

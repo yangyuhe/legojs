@@ -73,7 +73,7 @@ export function ConfigPanel(props: {
       className="config-panel"
       closable={true}
       visible={true}
-      height="500"
+      height="70%"
       onClose={() => {
         dispatch({ type: Action.HIDE_CONFIG_PANEL });
       }}

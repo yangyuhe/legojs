@@ -7,6 +7,7 @@ export interface ModuleConfig {
   states?: { [key: string]: string };
   options?: any;
   refs?: { [name: string]: ModuleConfig[] };
+  id?: string;
 }
 export interface LegoComponent {
   type: string;
@@ -18,4 +19,5 @@ export interface LegoProps<T> {
   options: T;
   set: (name: string, value: any) => void;
   runArgs: any;
+  id: string;
 }

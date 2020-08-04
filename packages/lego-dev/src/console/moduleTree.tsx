@@ -1,8 +1,15 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useContext,
+} from "react";
 import { Tree } from "antd";
 import "./index.less";
 import { ModuleConfig } from "@lego/core";
 import { useSelector } from "react-redux";
+import { DevContext } from "../main";
 interface Props {
   onModuleSelect: (paths: string[]) => void;
 }
@@ -10,26 +17,26 @@ export function ModuleTreePanel(props: Props) {
   const configs: ModuleConfig[] = useSelector((store) => store.config.configs);
   const [selectedKeys, setSelectedKeys] = useState([]);
   const configPanelShow = useSelector((store) => store.app.showConfigPanel);
+  const devContext = useContext(DevContext);
   useEffect(() => {
     if (!configPanelShow) {
       setSelectedKeys([]);
     }
   }, [configPanelShow]);
-  const transfer = (configs: ModuleConfig[], parentIndex) => {
+  const getTree = (configs: ModuleConfig[]) => {
     return configs.map((item, index) => {
       let data = {
         title: item.name || item.type,
-        key: parentIndex + "-" + index,
+        key: item.id,
         children: [],
       };
       if (item.refs) {
         for (let key in item.refs) {
           let config = item.refs[key];
-          config = Array.isArray(config) ? config : [config];
           let child = {
             title: key,
-            key: parentIndex + "-" + index + "-" + key,
-            children: transfer(config, parentIndex + "-" + index + "-" + key),
+            key: item.id + "-" + key,
+            children: getTree(config),
           };
           data.children.push(child);
         }
@@ -40,7 +47,7 @@ export function ModuleTreePanel(props: Props) {
   const treeData = useMemo(() => {
     let rootChildren = [];
     if (configs) {
-      rootChildren = transfer(configs, "0");
+      rootChildren = getTree(configs);
     }
     return [
       {
@@ -56,9 +63,33 @@ export function ModuleTreePanel(props: Props) {
       let path = selectedKeys[0];
       let paths = path.split("-");
       props.onModuleSelect(paths);
+      devContext.postMessage(
+        {
+          type: "lego_tree_focus",
+          value: path,
+        },
+        "*"
+      );
     } else {
       setSelectedKeys([]);
     }
+  };
+  const mouseEnter = (evt) => {
+    devContext.postMessage(
+      {
+        type: "lego_tree_focus",
+        value: evt.node.key,
+      },
+      "*"
+    );
+  };
+  const mouseLeave = (evt) => {
+    devContext.postMessage(
+      {
+        type: "lego_tree_blur",
+      },
+      "*"
+    );
   };
   return (
     <div className="module-tree">
@@ -68,6 +99,8 @@ export function ModuleTreePanel(props: Props) {
         showIcon={false}
         treeData={treeData}
         selectedKeys={selectedKeys}
+        onMouseEnter={mouseEnter}
+        onMouseLeave={mouseLeave}
       />
     </div>
   );

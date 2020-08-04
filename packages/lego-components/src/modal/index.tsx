@@ -31,6 +31,7 @@ export function LegoModal(props: LegoProps<ModalOption>) {
       visible={visible}
       onOk={onOk}
       onCancel={onCancel}
+      className={props.id}
     >
       {content}
     </Modal>

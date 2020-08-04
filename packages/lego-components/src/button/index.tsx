@@ -9,6 +9,10 @@ function LegoButton(props: LegoProps<ButtonOption>) {
   const OnClick = () => {
     props.emit("click");
   };
-  return <Button onClick={OnClick}>{props.options.text}</Button>;
+  return (
+    <Button className={props.id} onClick={OnClick}>
+      {props.options.text}
+    </Button>
+  );
 }
 register({ type: "lego-button", constructor: LegoButton });

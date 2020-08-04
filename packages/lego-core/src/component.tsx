@@ -190,6 +190,7 @@ export function GetComponent(item: ModuleConfig, runArgs?: any) {
             props.change(item.states[name], value);
           }
         }}
+        id={item.id == null ? null : "lego-class " + item.id}
         {...props}
         emit={(event: string, ...data: any[]) => {
           if (item.emits && item.emits[event]) {

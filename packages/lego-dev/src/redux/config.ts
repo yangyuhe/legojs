@@ -10,15 +10,17 @@ export default function (
   switch (action.type) {
     case Action.INIT_CONFIG:
       let initConfig = transferConfig(action.payload);
-      addKeyToConfig(initConfig);
+      addId(initConfig, "0");
       return { ...state, configs: action.payload };
     case Action.MODIFY_CONFIG:
       let { changes, paths } = action.payload;
       if (paths.length == 1 && paths[0] == "0") {
+        addId(changes, "0");
         return { ...state, configs: changes };
       }
       paths.shift();
       let newConfigs = modifyConfig(state.configs, changes, paths);
+      addId(newConfigs, "0");
       return { ...state, configs: newConfigs };
     default:
       return state;
@@ -68,19 +70,6 @@ function modifyRefsOfConfig(
   }
 }
 
-function addKeyToConfig(config: ModuleConfig[]) {
-  config.forEach((item) => {
-    if (item.refs) {
-      for (let key in item.refs) {
-        let config = item.refs[key];
-        if (!Array.isArray(config)) {
-          config = [config];
-        }
-        addKeyToConfig(config);
-      }
-    }
-  });
-}
 function transferConfig(configs: ModuleConfig[]) {
   if (!Array.isArray(configs)) configs = [configs];
   configs.forEach((config) => {
@@ -94,4 +83,15 @@ function transferConfig(configs: ModuleConfig[]) {
     }
   });
   return configs;
+}
+function addId(configs: ModuleConfig[], parentIndex) {
+  configs.map((item, index) => {
+    item.id = parentIndex + "-" + index;
+    if (item.refs) {
+      for (let key in item.refs) {
+        let config = item.refs[key];
+        addId(config, parentIndex + "-" + index + "-" + key);
+      }
+    }
+  });
 }
