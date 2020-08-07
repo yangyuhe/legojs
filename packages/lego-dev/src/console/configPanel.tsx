@@ -5,7 +5,6 @@ import AceEditor from "react-ace";
 import { useDispatch } from "react-redux";
 
 import "ace-builds/src-noconflict/mode-javascript";
-import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-github";
 import { js as jsbeautify } from "js-beautify";
 import "ace-builds/src-min-noconflict/ext-searchbox";
@@ -13,10 +12,6 @@ import "ace-builds/src-min-noconflict/ext-language_tools";
 import { Action } from "../redux/action";
 
 const ace = require("ace-builds/src-noconflict/ace");
-ace.config.setModuleUrl(
-  "ace/mode/json_worker",
-  "https://cdn.jsdelivr.net/npm/ace-builds@1.4.12/src-noconflict/worker-json.js"
-);
 
 const options = {
   indent_size: "4",
@@ -99,7 +94,7 @@ export function ConfigPanel(props: {
           <AceEditor
             value={value}
             onChange={onChange}
-            mode="json"
+            mode="javascript"
             theme="github"
             height="435px"
             width="100%"

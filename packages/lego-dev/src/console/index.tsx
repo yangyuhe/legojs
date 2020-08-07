@@ -6,6 +6,7 @@ import "./index.less";
 import { ModuleTreePanel } from "./moduleTree";
 import { useSelector, useDispatch } from "react-redux";
 import { Action } from "../redux/action";
+import { StringifyObject } from "../util";
 
 export function Console() {
   let showConfigPanel = useSelector((store) => store.app.showConfigPanel);
@@ -65,7 +66,7 @@ export function Console() {
         <ConfigPanel
           onChange={onConfigChange}
           des={configDes}
-          value={JSON.stringify(configValue)}
+          value={StringifyObject(configValue)}
         ></ConfigPanel>
       ) : null}
     </>

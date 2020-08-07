@@ -63,33 +63,24 @@ export function ModuleTreePanel(props: Props) {
       let path = selectedKeys[0];
       let paths = path.split("-");
       props.onModuleSelect(paths);
-      devContext.postMessage(
-        {
-          type: "lego_tree_focus",
-          value: path,
-        },
-        "*"
-      );
+      devContext.postMessage({
+        type: "lego_tree_focus",
+        value: path,
+      });
     } else {
       setSelectedKeys([]);
     }
   };
   const mouseEnter = (evt) => {
-    devContext.postMessage(
-      {
-        type: "lego_tree_focus",
-        value: evt.node.key,
-      },
-      "*"
-    );
+    devContext.postMessage({
+      type: "lego_tree_focus",
+      value: evt.node.key,
+    });
   };
   const mouseLeave = (evt) => {
-    devContext.postMessage(
-      {
-        type: "lego_tree_blur",
-      },
-      "*"
-    );
+    devContext.postMessage({
+      type: "lego_tree_blur",
+    });
   };
   return (
     <div className="module-tree">

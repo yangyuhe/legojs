@@ -1,10 +1,23 @@
-import React, { useState } from "react";
-export default function MockAjax(props) {
-  let [todos, setTodos] = useState([]);
-  props.on("send", function () {
-    if (props.options.url == "/api/todo" && props.options.method == "POST") {
-      todos.concat();
-    }
+let list = [];
+export function getList() {
+  return Promise.resolve().then(() => {
+    return list;
   });
-  return <></>;
+}
+export function addList(todo) {
+  list.push(todo);
+  return Promise.resolve();
+}
+export function deleteList(id) {
+  list = list.filter((item) => item.id !== id);
+  return Promise.resolve();
+}
+export function modifyList(todo) {
+  list = list.map((item) => {
+    if (item.id == todo.id) {
+      return { ...item, ...todo };
+    }
+    return item;
+  });
+  return Promise.resolve();
 }

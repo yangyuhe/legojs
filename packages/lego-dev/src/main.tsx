@@ -5,6 +5,7 @@ import "./index.less";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import Store from "./redux/store";
 import { Action } from "./redux/action";
+import { StringifyObject, CopyObject } from "./util";
 
 export const DevContext = React.createContext(null);
 function LegoDev(props: { configs: ModuleConfig[] }) {
@@ -22,13 +23,14 @@ function LegoDev(props: { configs: ModuleConfig[] }) {
     }, []);
 
     const postMessage = (msg: { type: string; value: any }) => {
-      iframe.current.contentWindow.postMessage(msg);
+      let str = StringifyObject(msg.value);
+      iframe.current.contentWindow.postMessage({ type: msg.type, value: str });
     };
     useEffect(() => {
       if (configs) {
         postMessage({
           type: "lego_change",
-          value: JSON.parse(JSON.stringify(configs)),
+          value: configs,
         });
       }
     }, [configs]);
@@ -58,9 +60,9 @@ function LegoDev(props: { configs: ModuleConfig[] }) {
       };
     }, []);
     const onIFrameLoad = () => {
-      iframe.current.contentWindow.postMessage({
+      postMessage({
         type: "lego_change",
-        value: JSON.parse(JSON.stringify(configs)),
+        value: configs,
       });
     };
 
@@ -87,7 +89,8 @@ function Embed() {
     let cbs = [];
     window.addEventListener("message", (evt) => {
       if (evt.data && evt.data.type === "lego_change") {
-        setConfigs(evt.data.value);
+        let config = new Function("return " + evt.data.value)();
+        setConfigs(config);
       }
       if (evt.data && evt.data.type === "lego_tree_focus") {
         let moduleDoms = document.querySelectorAll(".lego-class");

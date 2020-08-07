@@ -1,9 +1,12 @@
 import React from "react";
 import { LegoProps, register } from "@lego/core";
 export interface LabelOption {
-  text: string;
+  text: string | (() => string);
 }
 function Label(props: LegoProps<LabelOption>) {
-  return <span>{props.options.text}</span>;
+  let text = "";
+  if (typeof props.options.text == "function") text = props.options.text();
+  else text = props.options.text;
+  return <span>{text}</span>;
 }
 register({ type: "lego-label", constructor: Label });

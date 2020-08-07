@@ -3,6 +3,7 @@ import { ModuleConfig } from "./interface";
 import { getComponent } from "./register";
 import bus from "./bus";
 import { connect } from "react-redux";
+import { withStatement, lexicalParse, CopyObject, State } from "./util";
 
 function setRefsInOptions(config: ModuleConfig, options: any): void {
   if (options && typeof options == "object") {
@@ -27,17 +28,14 @@ function setRefsInOptions(config: ModuleConfig, options: any): void {
     }
   }
 }
-function withStatement(context, express) {
-  let fn = new Function("context", `with(context){return ${express}}`);
-  return fn(context);
-}
-function setDataInOptions(obj: any, datas: any): any {
+
+function setDataInOptions(obj: any, { state }): any {
   if (obj && typeof obj == "object") {
     for (let key in obj) {
       if (typeof obj[key] == "string") {
         let res;
         if ((res = obj[key].match(/^\${([^}]+)}$/))) {
-          obj[key] = withStatement(datas, res[1]);
+          obj[key] = withStatement(state, res[1]);
         } else {
           let variables = obj[key].match(/\${[^}]+}/g);
           if (variables) {
@@ -45,83 +43,37 @@ function setDataInOptions(obj: any, datas: any): any {
             let res = "";
             for (let i = 0; i < variables.length; i++) {
               let name = variables[i].substring(2, variables[i].length - 1);
-              res = res + litrals[i] + datas[name];
+              res = res + litrals[i] + withStatement(state, name);
             }
             res = res + litrals[litrals.length - 1];
             obj[key] = res;
           }
         }
       } else {
-        setDataInOptions(obj[key], datas);
+        setDataInOptions(obj[key], state);
       }
     }
   }
 }
-enum State {
-  identifier,
-  quote_single,
-  quote_double,
-  idle,
-}
-/**这个地方利用简单的词法分析找出表达式中的变量 */
-function lexicalParse(
-  express: string,
-  initialState: State,
-  cursor: number
-): { endIndex: number; identifiers: string[] } {
-  let i = cursor;
-  let state = initialState;
-  let identifiers: string[] = [];
-  let cache = [];
-  while (i < express.length) {
-    if (
-      state == State.idle &&
-      /\w/.test(express[i]) &&
-      !/\d/.test(express[i])
-    ) {
-      cache.push(express[i]);
-      state = State.identifier;
-      i++;
-      continue;
+function bindFnInOptions(obj: any, cache: any, depends: string[]): any {
+  if (obj && typeof obj == "object") {
+    for (let key in obj) {
+      if (typeof obj[key] == "function") {
+        obj[key] = obj[key].bind({
+          getState: (name) => {
+            if (depends.indexOf(name) == -1) {
+              depends.push(name);
+            }
+            return cache.state[name];
+          },
+        });
+      } else {
+        bindFnInOptions(obj[key], cache, depends);
+      }
     }
-    if (state == State.identifier && /\w/.test(express[i])) {
-      cache.push(express[i]);
-      i++;
-      continue;
-    }
-    if (state == State.identifier && !/\w/.test(express[i])) {
-      identifiers.push(cache.join(""));
-      cache = [];
-      state = State.idle;
-      continue;
-    }
-    if (
-      (state != State.quote_double && express[i] == '"') ||
-      (state != State.quote_single && express[i] == "'")
-    ) {
-      let { endIndex } = lexicalParse(
-        express,
-        express[i] == '"' ? State.quote_double : State.quote_single,
-        i + 1
-      );
-      i = endIndex;
-      continue;
-    }
-    if (
-      (state == State.quote_single && express[i] == "'") ||
-      (state == State.quote_double && express[i] == '"')
-    ) {
-      return { endIndex: i + 1, identifiers: [] };
-    }
-    i++;
   }
-  if (state == State.identifier && cache.length > 0) {
-    identifiers.push(cache.join(""));
-    state = State.idle;
-  }
-  if (state != State.idle) throw new Error("express syntax error," + express);
-  return { endIndex: i, identifiers: identifiers };
 }
+
 function getDependancy(obj): string[] {
   let depends: string[] = [];
   if (obj && typeof obj == "object") {
@@ -134,14 +86,18 @@ function getDependancy(obj): string[] {
           depends = depends.concat(identifiers);
           res = reg.exec(obj[key]);
         }
-      } else depends = depends.concat(getDependancy(obj[key]));
+        continue;
+      }
+      depends = depends.concat(getDependancy(obj[key]));
     }
   }
   return Array.from(new Set(depends));
 }
 export function GetComponent(item: ModuleConfig, runArgs?: any) {
   let depends = item.options ? getDependancy(item.options) : [];
+  let cache = { state: null };
   let mapStateToProps = (state) => {
+    cache.state = state;
     let map = {};
     depends.forEach((key) => {
       map[key] = state[key];
@@ -157,16 +113,16 @@ export function GetComponent(item: ModuleConfig, runArgs?: any) {
   };
   function Component(props) {
     let Com = getComponent(item.type);
-    let options = useMemo(
-      () => {
-        if (!item.options) return item.options;
-        let opt = JSON.parse(JSON.stringify(item.options));
-        if (depends.length > 0) setDataInOptions(opt, props);
-        setRefsInOptions(item, opt);
-        return opt;
-      },
-      depends.map((item) => props[item])
-    );
+
+    let options = null;
+    if (item.options) {
+      let opt = CopyObject(item.options);
+      if (depends.length > 0) setDataInOptions(opt, cache);
+      bindFnInOptions(opt, cache, depends);
+      setRefsInOptions(item, opt);
+      options = opt;
+    }
+
     let [triggers] = useState({});
     const stashTrigger = (name: string, fn: Function) => {
       if (!triggers[name]) triggers[name] = [];
