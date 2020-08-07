@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@lego/components": "^1.0.0",
+    "@lego/antd": "^1.0.0",
     "@lego/core": "^1.0.0",
     "@lego/dev": "^1.0.0",
     "antd": "^4.4.1",

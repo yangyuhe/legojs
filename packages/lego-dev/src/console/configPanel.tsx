@@ -11,8 +11,6 @@ import "ace-builds/src-min-noconflict/ext-searchbox";
 import "ace-builds/src-min-noconflict/ext-language_tools";
 import { Action } from "../redux/action";
 
-const ace = require("ace-builds/src-noconflict/ace");
-
 const options = {
   indent_size: "4",
   indent_char: " ",
@@ -105,6 +103,7 @@ export function ConfigPanel(props: {
               enableSnippets: false,
               showLineNumbers: true,
               tabSize: 4,
+              useWorker: false,
             }}
           />
         </div>

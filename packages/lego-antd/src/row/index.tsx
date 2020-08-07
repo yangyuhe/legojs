@@ -4,16 +4,20 @@ export interface RowOption {
   children: any;
   align: "left" | "right";
 }
+let defaultOption = {
+  align: "left",
+  children: () => null,
+};
 function Row(props: LegoProps<RowOption>) {
+  let options = Object.assign(defaultOption, props.options);
   return (
     <div
       style={{
         display: "flex",
-        justifyContent:
-          props.options.align == "left" ? "flex-start" : "flex-end",
+        justifyContent: options.align == "left" ? "flex-start" : "flex-end",
       }}
     >
-      {props.options.children()}
+      {options.children()}
     </div>
   );
 }

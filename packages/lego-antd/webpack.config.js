@@ -10,7 +10,7 @@ const config = {
   watch: true,
   output: {
     filename: "[name].js",
-    library: "lego-component",
+    library: "antd-lego",
     libraryTarget: "umd",
   },
   resolve: {

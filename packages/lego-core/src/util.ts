@@ -4,6 +4,9 @@ export function StringifyObject(obj: any): string {
     obj.forEach((item) => {
       res += StringifyObject(item) + ",";
     });
+    if (res.endsWith(",")) {
+      res = res.slice(0, res.length - 1);
+    }
     return res + "]";
   }
   if (Object.prototype.toString.call(obj) == "[object String]") {
@@ -22,6 +25,9 @@ export function StringifyObject(obj: any): string {
         break;
     }
     res += key + ":" + value + ",";
+  }
+  if (res.endsWith(",")) {
+    res = res.slice(0, res.length - 1);
   }
   res += "}";
   return res;
