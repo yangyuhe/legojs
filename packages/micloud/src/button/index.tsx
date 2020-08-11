@@ -15,4 +15,4 @@ function LegoButton(props: LegoProps<ButtonOption>) {
     </Button>
   );
 }
-register({ type: "lego-button", constructor: LegoButton });
+register({ type: "antd-button", constructor: LegoButton });

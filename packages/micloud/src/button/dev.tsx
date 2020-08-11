@@ -4,4 +4,4 @@ let config = `{
   text: "string类型",
   children: "ModuleConfig配置",
 }`;
-describeModule({ type: "lego-button", des: config });
+describeModule({ type: "antd-button", des: config });

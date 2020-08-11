@@ -20,6 +20,7 @@ export function StringifyObject(obj: any): string {
       case "[object String]":
         value = '"' + value + '"';
         break;
+      case "[object Array]":
       case "[object Object]":
         value = StringifyObject(value);
         break;

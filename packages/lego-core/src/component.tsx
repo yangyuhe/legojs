@@ -13,7 +13,6 @@ function setRefsInOptions(config: ModuleConfig, options: any): void {
           let ref = options[key].slice(1);
           if (config.refs && config.refs[ref]) {
             let refModule = config.refs[ref];
-            refModule = Array.isArray(refModule) ? refModule : [refModule];
             options[key] = (runArgs) => {
               return (refModule as ModuleConfig[]).map((config, index) => {
                 let Com = GetComponent(config, runArgs);

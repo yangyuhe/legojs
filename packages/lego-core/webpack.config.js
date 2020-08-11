@@ -1,6 +1,5 @@
 const webpack = require("webpack");
 const path = require("path");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const config = {
   entry: path.resolve(__dirname, "src/index.ts"),
   devtool: "source-map",
@@ -27,7 +26,6 @@ const config = {
   optimization: {
     usedExports: true,
   },
-  plugins: [new MiniCssExtractPlugin()],
 };
 webpack(config, (err, stats) => {
   if (err) console.log(err);

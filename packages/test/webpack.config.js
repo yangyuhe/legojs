@@ -45,7 +45,18 @@ const config = {
     ],
   },
   resolve: {
-    modules: [path.resolve(__dirname, "node_modules")],
+    symlinks: false,
+    alias: {
+      "@lego/core": path.resolve(__dirname, "node_modules/@lego/core"),
+      react: path.resolve(__dirname, "node_modules/react"),
+      antd: path.resolve(__dirname, "node_modules/antd"),
+      "react-router-dom": path.resolve(
+        __dirname,
+        "node_modules/react-router-dom"
+      ),
+      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
+      axios: path.resolve(__dirname, "node_modules/axios"),
+    },
   },
   plugins: [
     new HtmlPlugin({ template: "src/index.html" }),
@@ -65,7 +76,12 @@ const config = {
   },
 };
 const compiler = webpack(config);
-const webpackdev = new WebpackDevServer(compiler, { hot: true });
+const webpackdev = new WebpackDevServer(compiler, {
+  hot: true,
+  proxy: {
+    "/api": "http://localhost:3002",
+  },
+});
 webpackdev.listen(3001);
 
 // const compiler = webpack(config, (err, stats) => {
