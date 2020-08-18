@@ -25,36 +25,61 @@ emit 可以让组件发出一个事件，on 可以让组件监听一个事件，
 export interface ModuleConfig {
   type: string;
   name?: string;
-  key?: string;
-  emits: { [key: string]: string };
   triggers?: { [key: string]: string };
-  states?: { [key: string]: string };
   options?: any;
   refs?: { [name: string]: ModuleConfig[] };
   id?: string;
 }
 ```
 
-### 最简单的事例
+### 基础组件示例，基础组件是使用 react 编写的组件
 
 ```typescript
 import { Lego, register } from "@lego/core";
 import React from "react";
 import ReactDom from "react-dom";
-//定义组件
+//定义基础组件
 function Hello(props) {
   let text = props.options.text;
   return `hello,${text}`;
 }
-//注册组件
+//注册基础组件
 register({ type: "Hello", constructor: Hello });
-//配置文件
+//使用基础组件
 let configs = [
   {
     type: "Hello",
     options: {
       text: "lego",
     },
+  },
+];
+
+ReactDom.render(<Lego configs={configs} />, document.getElementById("app"));
+```
+
+### 业务组件示例,业务组件是一堆基础组件的配置
+
+```typescript
+import { Lego, register } from "@lego/core";
+import React from "react";
+import ReactDom from "react-dom";
+//定义基础组件
+function Hello(props) {
+  let text = props.options.text;
+  return `hello,${text}`;
+}
+//注册基础组件
+register({ type: "Hello", constructor: Hello });
+//注册业务组件
+register({
+  type: "Foo",
+  constructor: { type: "Hello", options: { text: "lego" } },
+});
+//使用业务组件
+let configs = [
+  {
+    type: "Foo",
   },
 ];
 
