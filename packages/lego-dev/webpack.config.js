@@ -7,7 +7,7 @@ const config = {
   mode: "development",
   output: {
     filename: "bundle.js",
-    library: "lego",
+    library: "lego-dev",
     libraryTarget: "umd",
   },
   resolve: {

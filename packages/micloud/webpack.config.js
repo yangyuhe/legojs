@@ -12,7 +12,7 @@ const config = {
   watch: true,
   output: {
     filename: "[name].js",
-    library: "antd-lego",
+    library: "micloud-lego",
     libraryTarget: "umd",
   },
   resolve: {

@@ -9,34 +9,49 @@ import "@lego/dev/dist/main.css";
 
 import home from "./home";
 import login from "./login";
+
+let clock = [
+  {
+    type: "lego-timmer",
+    name: "timmer",
+    options: {
+      cancel: "${reset.times%2==0}",
+      interval: 1000,
+    },
+  },
+  {
+    name: "reset",
+    type: "antd-button",
+    options: {
+      text: "${$props.text}",
+    },
+  },
+  {
+    type: "lego-label",
+    options: {
+      text: "${timmer.tick.toLocaleString()}",
+    },
+  },
+];
+register({ type: "clock", constructor: clock });
 let configs = [
   {
-    type: "cloud-router",
+    type: "clock",
     options: {
-      content: "@content",
+      text: "${counter.times}",
+    },
+    name: "clock",
+  },
+  {
+    type: "antd-button",
+    name: "counter",
+    options: {
+      text: "${clock.reset.times}",
+      options: "@extraBtn",
     },
     refs: {
-      content: {
-        type: "cloud-route",
-        refs: {
-          home: home,
-          login: login,
-        },
-        options: {
-          configs: [
-            {
-              path: "/login",
-              component: "@login",
-            },
-            {
-              path: "/home",
-              component: "@home",
-            },
-            {
-              redirect: "/login",
-            },
-          ],
-        },
+      extraBtn: {
+        type: "antd-button",
       },
     },
   },

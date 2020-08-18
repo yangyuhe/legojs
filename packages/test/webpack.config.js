@@ -48,6 +48,7 @@ const config = {
     symlinks: false,
     alias: {
       "@lego/core": path.resolve(__dirname, "node_modules/@lego/core"),
+      "@lego/dev": path.resolve(__dirname, "node_modules/@lego/dev"),
       react: path.resolve(__dirname, "node_modules/react"),
       antd: path.resolve(__dirname, "node_modules/antd"),
       "react-router-dom": path.resolve(

@@ -1,13 +1,11 @@
 import { LegoComponent } from "./interface";
+import { Lego } from "./lego";
 let componentMap: { [key: string]: any } = {};
-export function register(ComponentFactory: LegoComponent | LegoComponent[]) {
-  if (!Array.isArray(ComponentFactory)) ComponentFactory = [ComponentFactory];
-  ComponentFactory.forEach((item) => {
-    if (componentMap[item.type]) {
-      throw new Error(`component ${item.type} already exist`);
-    }
-    componentMap[item.type] = item.constructor;
-  });
+export function register(ComponentFactory: LegoComponent) {
+  if (componentMap[ComponentFactory.type]) {
+    throw new Error(`component ${ComponentFactory.type} already exist`);
+  }
+  componentMap[ComponentFactory.type] = ComponentFactory.constructor;
 }
 export function getComponent(name: string) {
   if (!componentMap[name]) {

@@ -1,10 +1,7 @@
 export interface ModuleConfig {
   type: string;
   name?: string;
-  key?: string;
-  emits: { [key: string]: string };
   triggers?: { [key: string]: string };
-  states?: { [key: string]: string };
   options?: any;
   refs?: { [name: string]: ModuleConfig[] };
   id?: string;

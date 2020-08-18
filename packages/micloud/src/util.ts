@@ -6,7 +6,8 @@ export function Merge<T>(target: T, source: T): T {
     });
     return res as T;
   } else {
-    return CopyObject(source);
+    if (source == null) return target;
+    return source;
   }
 }
 export function isObject(obj) {
