@@ -10,7 +10,6 @@ export interface LegoProps<T> {
   on: (event: string, fn: Function) => void;
   options: T;
   set: (name: string, value: any) => void;
-  runArgs: any;
   id: string;
 }
 ```
