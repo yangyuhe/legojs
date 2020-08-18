@@ -6,15 +6,17 @@ lego 组件就是一个 React 组件，不管是使用 class 也好，function �
 
 ```typescript
 export interface LegoProps<T> {
+  //emit 可以让组件发出一个事件
   emit: (event: string, ...data: any[]) => void;
+  //on 可以让组件监听一个事件
   on: (event: string, fn: Function) => void;
+  //options 是组件配置项
   options: T;
+  //set 可以让组件设置一个其他组件可以访问的 redux 值
   set: (name: string, value: any) => void;
   id: string;
 }
 ```
-
-emit 可以让组件发出一个事件，on 可以让组件监听一个事件，options 是组件配置项，set 可以让组件设置一个其他组件可以访问的 redux 值，runArgs 是组件运行时参数（用于复杂场景）
 
 ### 如何书写 lego 配置文件
 
