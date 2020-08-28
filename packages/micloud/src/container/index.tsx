@@ -5,6 +5,10 @@ export interface ContainerOption {
   children: any;
 }
 function Container(props: LegoProps<ContainerOption>) {
-  return <div style={props.options.style}>{props.options.children()}</div>;
+  return (
+    <div className={props.id} style={props.options.style}>
+      {props.options.children}
+    </div>
+  );
 }
-register({ type: "lego-container", constructor: Container });
+register({ type: "micloud-container", constructor: Container });

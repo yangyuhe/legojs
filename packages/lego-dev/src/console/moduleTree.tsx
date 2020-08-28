@@ -72,6 +72,7 @@ export function ModuleTreePanel(props: Props) {
     }
   };
   const mouseEnter = (evt) => {
+    debugger;
     devContext.postMessage({
       type: "lego_tree_focus",
       value: evt.node.key,

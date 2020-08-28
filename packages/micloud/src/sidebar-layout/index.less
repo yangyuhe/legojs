@@ -1,35 +1,21 @@
-.antd-layout {
-  height: 100%;
-  .trigger {
-    font-size: 18px;
-    line-height: 64px;
-    padding: 0 24px;
-    cursor: pointer;
-    transition: color 0.3s;
-    display: flex;
-  }
-
-  .trigger:hover {
-    color: #1890ff;
-  }
-
-  .logo {
-    height: 32px;
-    background: rgba(255, 255, 255, 0.2);
-    margin: 16px;
-    text-align: center;
-    img {
-      height: 100%;
+.micloud-sidebarlayout {
+  .micloud-sidebar {
+    .ant-layout-sider-children {
+      display: flex;
+      flex-direction: column;
+      .title {
+        font-size: 18px;
+        color: #333;
+        padding: 22px 0 22px 22px;
+        border-right: 1px solid #f0f0f0;
+      }
+      .ant-menu-root {
+        flex: 1 1 auto;
+      }
     }
   }
-
-  .site-layout .site-layout-background {
-    background: #fff;
-    display: flex;
-    align-items: center;
-    .auth {
-      margin-left: auto;
-      padding: 0 10px;
-    }
+  .ant-layout-content {
+    background: white;
+    padding: 20px;
   }
 }

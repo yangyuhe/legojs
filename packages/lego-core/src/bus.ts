@@ -15,5 +15,6 @@ class Bus {
     this.listeners[event] = this.listeners[event].filter((item) => item !== fn);
   }
 }
+class EvtMgr {}
 let bus = new Bus();
 export default bus;

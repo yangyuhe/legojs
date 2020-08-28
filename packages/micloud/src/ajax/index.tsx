@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { register, LegoProps } from "@lego/core";
 import { Merge } from "../util";
 import axios, { Method } from "axios";
 
 export interface AjaxOption {
-  request:
-    | { url: string; method: Method; params: any }
-    | { url: string; method: Method; params }[];
-  type: "parallel" | "serial";
-  invoke: "immediate" | "trigger";
+  url: string;
+  method: "get" | "post" | "delete" | "put";
+  params: any;
+  immediate: boolean;
+  transform?: (data) => any;
 }
 const defaultOption: AjaxOption = {
-  request: [],
-  type: "parallel",
-  invoke: "immediate",
+  url: "",
+  method: "get",
+  params: {},
+  immediate: true,
 };
 function Ajax(props: LegoProps<AjaxOption>) {
   let options = Merge(defaultOption, props.options);
@@ -32,104 +33,41 @@ function Ajax(props: LegoProps<AjaxOption>) {
     props.emit("finish");
     props.set("isFinish", true);
   };
-  const request = () => {
-    if (Array.isArray(options.request)) {
-      if (options.type == "parallel") {
-        let promises = [];
-        options.request.forEach((item) => {
-          promises.push(
-            axios.request({
-              url: item.url,
-              params: item.params,
-              method: item.method,
-            })
-          );
-        });
-        Promise.resolve(promises)
-          .then(
-            (res) => {
-              success(res);
-            },
-            (err) => {
-              fail(err);
-            }
-          )
-          .finally(() => {
-            finish();
-          });
-      } else {
-        let promise = null;
-        let res = [];
-        options.request.forEach((item) => {
-          if (!promise) {
-            promise = axios.request({
-              url: item.url,
-              params: item.params,
-              method: item.method,
-            });
-          } else {
-            promise = promise.then(
-              (data) => {
-                res.push(data);
-                return axios.request({
-                  url: item.url,
-                  params: item.params,
-                  method: item.method,
-                });
-              },
-              (err) => {
-                throw err;
-              }
-            );
-          }
-        });
-        if (promise) {
-          promise
-            .then(
-              (data) => {
-                res.push(data);
-                success(data);
-              },
-              (err) => {
-                fail(err);
-              }
-            )
-            .finally(() => {
-              finish();
-            });
+  const request = (data?) => {
+    axios
+      .request({
+        url: options.url,
+        params: data || options.params,
+        method: options.method,
+      })
+      .then(
+        (res) => {
+          let data = res.data;
+          if (options.transform) data = options.transform(data);
+          success(data);
+        },
+        (err) => {
+          fail(err);
         }
-      }
-    } else {
-      axios
-        .request({
-          url: options.request.url,
-          params: options.request.params,
-          method: options.request.method,
-        })
-        .then(
-          (res) => {
-            success(res);
-          },
-          (err) => {
-            fail(err);
-          }
-        )
-        .finally(() => {
-          finish();
-        });
-    }
+      )
+      .finally(() => {
+        finish();
+      });
   };
+  useEffect(() => {
+    if (options.immediate && options.url) {
+      request();
+    }
+  }, []);
 
-  if (options.invoke == "immediate") {
-    request();
-  }
-  props.on("request", () => {
-    request();
+  props.on("request", (data) => {
+    // request(data);
+    debugger;
   });
   return <></>;
 }
 
 register({
-  type: "antd-ajax",
+  type: "micloud-ajax",
   constructor: Ajax,
 });

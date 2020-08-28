@@ -1,11 +1,15 @@
 import { LegoComponent } from "./interface";
-import { Lego } from "./lego";
+import { transformArray } from "./util";
 let componentMap: { [key: string]: any } = {};
 export function register(ComponentFactory: LegoComponent) {
   if (componentMap[ComponentFactory.type]) {
     throw new Error(`component ${ComponentFactory.type} already exist`);
   }
-  componentMap[ComponentFactory.type] = ComponentFactory.constructor;
+  let constr = ComponentFactory.constructor;
+  if (typeof constr != "function") {
+    constr = transformArray(constr as any);
+  }
+  componentMap[ComponentFactory.type] = constr;
 }
 export function getComponent(name: string) {
   if (!componentMap[name]) {

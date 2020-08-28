@@ -1,24 +1,32 @@
 import React from "react";
 import { LegoProps, register } from "@lego/core";
+import { Merge } from "../util";
+import "./index.less";
 export interface RowOption {
   children: any;
-  align: "left" | "right";
+  align: "left" | "right" | "center";
 }
 let defaultOption = {
   align: "left",
-  children: () => null,
+  children: null,
 };
 function Row(props: LegoProps<RowOption>) {
-  let options = Object.assign(defaultOption, props.options);
+  const options = Merge(defaultOption, props.options);
+  let align = "";
+  if (options.align === "left") align = "flex-start";
+  if (options.align == "right") align = "flex-end";
+  if (options.align == "center") align = "center";
   return (
     <div
+      className="micloud-row"
       style={{
         display: "flex",
-        justifyContent: options.align == "left" ? "flex-start" : "flex-end",
+        paddingBottom: "20px",
+        justifyContent: align,
       }}
     >
-      {options.children()}
+      {options.children}
     </div>
   );
 }
-register({ type: "lego-row", constructor: Row });
+register({ type: "micloud-row", constructor: Row });

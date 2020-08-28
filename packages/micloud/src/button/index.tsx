@@ -2,27 +2,32 @@ import React, { useState, useRef, useEffect } from "react";
 import { Button } from "antd";
 import { LegoProps, ModuleConfig, register } from "@lego/core";
 import { Merge } from "../util";
+import { Link } from "react-router-dom";
 export interface ButtonOption {
-  text: string;
+  label: string;
+  link?: string;
+  type?: string;
 }
 const defaultOption: ButtonOption = {
-  text: "",
+  label: "",
 };
+
 function LegoButton(props: LegoProps<ButtonOption>) {
   let options = Merge(defaultOption, props.options);
-  const ref = useRef(0);
-  useEffect(() => {
-    props.set("times", ref.current);
-  }, []);
   const OnClick = () => {
-    ref.current = ref.current + 1;
-    props.set("times", ref.current);
     props.emit("click");
   };
-  return (
-    <Button className={props.id} onClick={OnClick}>
-      {options.text}
-    </Button>
-  );
+  if (!options.link)
+    return (
+      <Button className={props.id} onClick={OnClick} type={options.type as any}>
+        {options.label}
+      </Button>
+    );
+  else
+    return (
+      <Button className={props.id} onClick={OnClick} type={options.type as any}>
+        <Link to={options.link}>{options.label}</Link>
+      </Button>
+    );
 }
-register({ type: "antd-button", constructor: LegoButton });
+register({ type: "micloud-button", constructor: LegoButton });

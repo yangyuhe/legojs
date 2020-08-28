@@ -7,52 +7,58 @@ import "micloud/dist/index.css";
 import "micloud/dist/dev";
 import "@lego/dev/dist/main.css";
 
-import home from "./home";
-import login from "./login";
-
-let clock = [
-  {
-    type: "lego-timmer",
-    name: "timmer",
-    options: {
-      cancel: "${reset.times%2==0}",
-      interval: 1000,
-    },
-  },
-  {
-    name: "reset",
-    type: "antd-button",
-    options: {
-      text: "${$props.text}",
-    },
-  },
-  {
-    type: "lego-label",
-    options: {
-      text: "${timmer.tick.toLocaleString()}",
-    },
-  },
-];
-register({ type: "clock", constructor: clock });
 let configs = [
   {
-    type: "clock",
-    options: {
-      text: "${counter.times}",
-    },
-    name: "clock",
-  },
-  {
-    type: "antd-button",
-    name: "counter",
-    options: {
-      text: "${clock.reset.times}",
-      options: "@extraBtn",
-    },
+    type: "micloud-container",
     refs: {
-      extraBtn: {
-        type: "antd-button",
+      children: [
+        {
+          type: "micloud-form",
+          name: "form",
+          triggers: {
+            submit: "save.click",
+          },
+          options: {
+            fields: [
+              {
+                label: "姓名",
+                name: "username",
+                value: "hexiang",
+                type: "input",
+              },
+              {
+                label: "年龄",
+                name: "age",
+                value: 12,
+                type: "input",
+              },
+            ],
+          },
+        },
+        {
+          type: "micloud-button",
+          name: "save",
+          options: {
+            label: "保存",
+          },
+        },
+        {
+          type: "micloud-modal",
+          triggers: {
+            show: "form.submit",
+          },
+          options: {
+            title: "提示",
+            content: "提交成功${JSON.stringify(form.result)}",
+          },
+        },
+      ],
+    },
+    options: {
+      style: {
+        padding: "20px",
       },
+      children: "@children",
     },
   },
 ];

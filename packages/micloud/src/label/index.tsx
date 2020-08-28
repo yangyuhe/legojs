@@ -9,4 +9,4 @@ function Label(props: LegoProps<LabelOption>) {
   else text = props.options.text;
   return <span>{text}</span>;
 }
-register({ type: "lego-label", constructor: Label });
+register({ type: "micloud-label", constructor: Label });

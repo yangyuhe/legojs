@@ -1,13 +1,21 @@
 import React, { useState, useMemo } from "react";
 import { Modal } from "antd";
 import { register, LegoProps } from "@lego/core";
+import { Merge } from "../util";
 
 export interface ModalOption {
   title: string;
   content: any;
+  initialShow: boolean;
 }
-export function LegoModal(props: LegoProps<ModalOption>) {
-  let [visible, setVisible] = useState(false);
+const defaultOption: ModalOption = {
+  title: "",
+  content: "",
+  initialShow: false,
+};
+export function MiModal(props: LegoProps<ModalOption>) {
+  let options = Merge(defaultOption, props.options);
+  let [visible, setVisible] = useState(options.initialShow);
   props.on("show", () => {
     setVisible(true);
   });
@@ -21,23 +29,19 @@ export function LegoModal(props: LegoProps<ModalOption>) {
   const onCancel = () => {
     setVisible(false);
   };
-  let content = useMemo(() => {
-    if (typeof props.options.content == "string") return props.options.content;
-    return props.options.content();
-  }, []);
   return (
     <Modal
-      title={props.options.title}
+      title={options.title}
       visible={visible}
       onOk={onOk}
       onCancel={onCancel}
       className={props.id}
     >
-      {content}
+      {options.content}
     </Modal>
   );
 }
 register({
-  type: "lego-modal",
-  constructor: LegoModal,
+  type: "micloud-modal",
+  constructor: MiModal,
 });

@@ -44,7 +44,7 @@ export function Console() {
     try {
       dispatch({
         type: Action.MODIFY_CONFIG,
-        payload: { changes: JSON.parse(value), paths: curPath },
+        payload: { changes: new Function("return " + value)(), paths: curPath },
       });
       dispatch({ type: Action.HIDE_CONFIG_PANEL });
     } catch (err) {

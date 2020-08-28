@@ -23,6 +23,10 @@ function getNew(state, paths: string[], value) {
   return copy;
 }
 
-const store = createStore(reducer);
+const store = createStore(
+  reducer,
+  (window as any).__REDUX_DEVTOOLS_EXTENSION__ &&
+    (window as any).__REDUX_DEVTOOLS_EXTENSION__()
+);
 (window as any).store = store;
 export default store;

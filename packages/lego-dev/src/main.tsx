@@ -94,16 +94,13 @@ function Embed() {
       }
       if (evt.data && evt.data.type === "lego_tree_focus") {
         let moduleDoms = document.querySelectorAll(".lego-class");
+        let value = JSON.parse(evt.data.value);
         cbs = [].slice
           .call(moduleDoms, 0)
           .filter((dom) => {
             return [].slice
               .call(dom.classList, 0)
-              .find(
-                (name) =>
-                  name == evt.data.value ||
-                  name.startsWith(evt.data.value + "-")
-              );
+              .find((name) => name == value || name.startsWith(value + "-"));
           })
           .map((dom) => {
             let { left, top } = getPos(dom);
@@ -125,7 +122,7 @@ function Embed() {
       }
     });
   }, []);
-  return configs ? <Lego config={configs}></Lego> : null;
+  return configs ? <Lego configs={configs}></Lego> : null;
 }
 function getPos(dom: HTMLElement) {
   let top = dom.offsetTop;
