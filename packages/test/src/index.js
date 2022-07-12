@@ -10,7 +10,8 @@ import "@lego/dev/dist/main.css";
 let configs = [
   {
     type: "micloud-container",
-    refs: {
+    scope: "$root",
+    children: {
       children: [
         {
           type: "micloud-form",
@@ -23,14 +24,14 @@ let configs = [
               {
                 label: "姓名",
                 name: "username",
-                value: "hexiang",
                 type: "input",
+                rules: [{ required: true }],
               },
               {
                 label: "年龄",
                 name: "age",
-                value: 12,
                 type: "input",
+                rules: [{ required: true }],
               },
             ],
           },
@@ -49,7 +50,46 @@ let configs = [
           },
           options: {
             title: "提示",
-            content: "提交成功${JSON.stringify(form.result)}",
+            content: "提交成功",
+            type: "success",
+          },
+        },
+        {
+          type: "micloud-table",
+          name: "table",
+          options: {
+            datas: "${list.data||[]}",
+            columns: [
+              {
+                title: "年龄",
+                key: "age",
+              },
+              {
+                title: "姓名",
+                key: "username",
+                primary: true,
+              },
+            ],
+            operator: {
+              title: "操作",
+              buttons: [
+                {
+                  event: "delete",
+                  label: "删除",
+                },
+              ],
+            },
+          },
+        },
+        {
+          type: "micloud-list",
+          name: "list",
+          options: {
+            primaryKey: "username",
+          },
+          triggers: {
+            add: "form.submit",
+            delete: "table.delete",
           },
         },
       ],

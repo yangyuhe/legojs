@@ -8,11 +8,12 @@ export interface MiFormOption {
 export interface MiFormItem {
   name: string;
   label: string;
-  type: "input" | "textarea" | "select" | "radio" | "checkbox";
+  type: "input" | "textarea" | "select" | "radio" | "checkbox" | "ajax-select";
   options?: { label: string; value: any }[];
   rules?: any[];
   hidden?: boolean;
   value?: any;
+  url: "";
 }
 const defaultOption: MiFormOption = {
   fields: [],
@@ -24,6 +25,7 @@ function MiForm(props: LegoProps<MiFormOption>) {
     form.validateFields().then((values) => {
       props.emit("submit", values);
       props.set("result", values);
+      form.resetFields();
     });
   });
   let initialValues = {};

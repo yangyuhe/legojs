@@ -8,7 +8,6 @@ export interface AjaxOption {
   method: "get" | "post" | "delete" | "put";
   params: any;
   immediate: boolean;
-  transform?: (data) => any;
 }
 const defaultOption: AjaxOption = {
   url: "",
@@ -43,7 +42,6 @@ function Ajax(props: LegoProps<AjaxOption>) {
       .then(
         (res) => {
           let data = res.data;
-          if (options.transform) data = options.transform(data);
           success(data);
         },
         (err) => {
@@ -58,7 +56,7 @@ function Ajax(props: LegoProps<AjaxOption>) {
     if (options.immediate && options.url) {
       request();
     }
-  }, []);
+  }, [options.immediate]);
 
   props.on("request", (data) => {
     // request(data);

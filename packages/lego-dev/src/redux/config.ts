@@ -42,19 +42,19 @@ function modifyConfig(
           newConfigs.push(changes);
         }
       } else {
-        let newItems = modifyRefsOfConfig(
-          oldConfigs[+top].refs,
+        let newItems = modifychildrenOfConfig(
+          oldConfigs[+top].children,
           changes,
           paths
         );
-        oldConfigs[+top].refs = newItems;
+        oldConfigs[+top].children = newItems;
         newConfigs.push(oldConfigs[+top]);
       }
     }
   }
   return newConfigs;
 }
-function modifyRefsOfConfig(
+function modifychildrenOfConfig(
   oldConfigs: { [name: string]: ModuleConfig[] },
   changes: ModuleConfig | ModuleConfig[],
   paths: string[]
@@ -73,12 +73,12 @@ function modifyRefsOfConfig(
 function transferConfig(configs: ModuleConfig[]) {
   if (!Array.isArray(configs)) configs = [configs];
   configs.forEach((config) => {
-    if (config.refs) {
-      Object.keys(config.refs).forEach((key) => {
-        if (!Array.isArray(config.refs[key])) {
-          config.refs[key] = [config.refs[key] as any];
+    if (config.children) {
+      Object.keys(config.children).forEach((key) => {
+        if (!Array.isArray(config.children[key])) {
+          config.children[key] = [config.children[key] as any];
         }
-        config.refs[key] = transferConfig(config.refs[key]);
+        config.children[key] = transferConfig(config.children[key]);
       });
     }
   });
@@ -87,9 +87,9 @@ function transferConfig(configs: ModuleConfig[]) {
 function addId(configs: ModuleConfig[], parentIndex) {
   configs.map((item, index) => {
     item.id = parentIndex + "-" + index;
-    if (item.refs) {
-      for (let key in item.refs) {
-        let config = item.refs[key];
+    if (item.children) {
+      for (let key in item.children) {
+        let config = item.children[key];
         addId(config, parentIndex + "-" + index + "-" + key);
       }
     }

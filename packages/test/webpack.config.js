@@ -80,7 +80,7 @@ const compiler = webpack(config);
 const webpackdev = new WebpackDevServer(compiler, {
   hot: true,
 });
-webpackdev.listen(3001);
+webpackdev.listen(3008);
 
 // const compiler = webpack(config, (err, stats) => {
 //   if (err) console.log(err);

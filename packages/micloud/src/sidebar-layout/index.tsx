@@ -104,11 +104,7 @@ function SidebarLayout(props: LegoProps<SidebarLayoutOption>) {
     <Layout className="micloud-sidebarlayout" style={{ height: "100%" }}>
       <Sider theme="light" className="micloud-sidebar">
         <div className="title">{options.title}</div>
-        <Menu
-          mode="inline"
-          defaultOpenKeys={openMenu}
-          selectedKeys={selectedMenu}
-        >
+        <Menu mode="inline" openKeys={openMenu} selectedKeys={selectedMenu}>
           {getMenu(options.menus)}
         </Menu>
       </Sider>
@@ -154,7 +150,7 @@ async function login() {
   if (res.data && res.data.code == 401) {
     let url =
       window.location.hostname === "cloud-staging.d.xiaomi.net"
-        ? "https://casdev.mioffice.cn/login"
+        ? "http://casdev.mioffice.cn/login"
         : "https://cas.mioffice.cn/login";
     const { protocol, hostname } = window.location;
     url += `?service=${window.encodeURIComponent(

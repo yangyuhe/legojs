@@ -1,23 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
 import bus from "./bus";
-import { GetComponent } from "./component";
+import { GetComponent, AttachScope } from "./component";
 import { ModuleConfig } from "./interface";
 import { getComponent } from "./register";
 import { evalExpression, evalOptions, getDependancyFields } from "./util";
-
+import store from "./redux/store";
+let id = 0;
 export function GetBuiltIn(config: ModuleConfig, scope: string) {
+  let _id = id++;
   let mapStateToProps = (state) => {
     let depends = getDependancyFields(config.options);
-    let cur = state;
-    if (scope) {
-      let paths = scope.split(".");
-      paths.forEach((path) => {
-        if (cur) cur = cur[path];
-        else cur = {};
-      });
-    }
-    if (!cur) cur = {};
+    let cur = Object.assign({}, scope ? state[scope] : state);
+    cur = AttachScope(cur, state);
     let map: { [key: string]: any } = {};
     depends.forEach((exp) => {
       map[exp] = evalExpression(exp, cur);
@@ -26,11 +21,12 @@ export function GetBuiltIn(config: ModuleConfig, scope: string) {
   };
   let mapDispatchToProps = (dispatch) => {
     return {
-      change(name, value) {
+      change(variable, name, value) {
         dispatch({
           type: "change",
           payload: {
-            scope: scope ? scope + "." + config.name : config.name,
+            scope,
+            variable,
             name,
             value,
           },
@@ -38,15 +34,21 @@ export function GetBuiltIn(config: ModuleConfig, scope: string) {
       },
     };
   };
-  function Component(props) {
+  if (config.name) {
+    store.dispatch({
+      type: "initVariable",
+      payload: { scope: scope, variable: config.name },
+    });
+  }
+  function LegoComponent(props) {
     let Com = getComponent(config.type);
-    const refs = useMemo(() => {
-      if (config.refs) {
+    const children = useMemo(() => {
+      if (config.children) {
         let res = {};
-        for (let key in config.refs) {
-          res[key] = (config.refs[key] as ModuleConfig[]).map(
+        for (let key in config.children) {
+          res[key] = (config.children[key] as ModuleConfig[]).map(
             (config, index) => {
-              let Com = GetComponent(config, scope, index);
+              let Com = GetComponent(config, scope);
               return <Com key={config.name || index} />;
             }
           );
@@ -56,7 +58,7 @@ export function GetBuiltIn(config: ModuleConfig, scope: string) {
         return {};
       }
     }, []);
-    const options = evalOptions(config.options, props, refs);
+    const options = evalOptions(config.options, props, children);
 
     let [triggers] = useState({});
     const stashTrigger = (name: string, fn: Function) => {
@@ -78,7 +80,7 @@ export function GetBuiltIn(config: ModuleConfig, scope: string) {
       <Com
         set={(name: string, value: any) => {
           if (config.name) {
-            props.change(name, value);
+            props.change(config.name, name, value);
           }
         }}
         id={config.id == null ? null : "lego-class " + config.id}
@@ -95,18 +97,25 @@ export function GetBuiltIn(config: ModuleConfig, scope: string) {
         }}
         on={(event: string, fn: Function) => {
           if (config.triggers && config.triggers[event]) {
-            stashTrigger(config.triggers[event], fn);
-            bus.listen(
-              scope
-                ? scope + "." + config.triggers[event]
-                : config.triggers[event],
-              fn
-            );
+            if (typeof config.triggers[event] == "string") {
+              let eventName = config.triggers[event] as string;
+              stashTrigger(eventName, fn);
+              bus.listen(_id, scope ? scope + "." + eventName : eventName, fn);
+            } else {
+              let trigger = config.triggers[event] as [string, Function];
+              stashTrigger(trigger[0], fn);
+              bus.listen(
+                _id,
+                scope ? scope + "." + trigger[0] : trigger[0],
+                fn,
+                trigger[1]
+              );
+            }
           }
         }}
         options={options}
       ></Com>
     );
   }
-  return connect(mapStateToProps, mapDispatchToProps)(Component);
+  return connect(mapStateToProps, mapDispatchToProps)(LegoComponent);
 }

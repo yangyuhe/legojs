@@ -2,11 +2,21 @@ export function Merge<T>(target: T, source: T): T {
   if (isObject(target) && isObject(source)) {
     let res = Object.assign({}, target);
     Object.keys(source).forEach((key) => {
-      res[key] = Merge(target[key], source[key]);
+      if (target.hasOwnProperty(key) && source.hasOwnProperty(key)) {
+        res[key] = Merge(target[key], source[key]);
+        return;
+      }
+      if (!target.hasOwnProperty(key) && source.hasOwnProperty(key)) {
+        res[key] = source[key];
+        return;
+      }
+      if (target.hasOwnProperty(key) && !source.hasOwnProperty(key)) {
+        res[key] = target[key];
+        return;
+      }
     });
     return res as T;
   } else {
-    if (source == null) return target;
     return source;
   }
 }

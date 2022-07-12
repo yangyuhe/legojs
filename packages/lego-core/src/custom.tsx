@@ -1,37 +1,29 @@
 import React, { useMemo } from "react";
 import { connect } from "react-redux";
-import { GetComponent } from "./component";
+import { GetComponent, AttachScope, GetScopeName } from "./component";
 import { ModuleConfig } from "./interface";
 import { getComponent } from "./register";
 import { evalExpression, evalOptions, getDependancyFields } from "./util";
 
-export function GetCustom(config: ModuleConfig, scope: string, index: number) {
+export function GetCustom(config: ModuleConfig, scope: string) {
   let mapStateToProps = (state) => {
     let depends = getDependancyFields(config.options);
-    let cur = state;
-    if (scope) {
-      let paths = scope.split(".");
-      paths.forEach((path) => {
-        if (cur) cur = cur[path];
-        else cur = {};
-      });
-    }
-    if (!cur) cur = {};
+    let cur = Object.assign({}, scope ? state[scope] : state);
+    cur = AttachScope(cur, state);
     let map: { [key: string]: any } = {};
     depends.forEach((exp) => {
       map[exp] = evalExpression(exp, cur);
     });
     return map;
   };
+  let customScope = config.scope || GetScopeName();
   let mapDispatchToProps = (dispatch) => {
     return {
       changeProps(name, value) {
         dispatch({
           type: "change",
           payload: {
-            scope: scope
-              ? scope + "." + (config.name || index)
-              : config.name || "" + index,
+            scope: customScope,
             name,
             value,
           },
@@ -47,13 +39,7 @@ export function GetCustom(config: ModuleConfig, scope: string, index: number) {
     let children = useMemo(() => {
       let configs = getComponent(config.type);
       return configs.map((item, subIndex) => {
-        let Com = GetComponent(
-          item,
-          scope
-            ? scope + "." + (config.name || index)
-            : config.name || "" + index,
-          subIndex
-        );
+        let Com = GetComponent(item, customScope);
         return <Com key={item.name || subIndex}></Com>;
       });
     }, []);

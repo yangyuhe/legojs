@@ -4,22 +4,24 @@ import { Lego, register } from "@lego/core";
 import "micloud";
 import "micloud/dist/index.css";
 import "micloud/dist/dev";
-import "./orderList";
+import "./orderTab";
 import "./orderAdd";
 
 let configs = [
   {
     type: "micloud-sidebar-layout",
     name: "root",
-    refs: {
-      orderList: {
-        type: "orderList",
+    scope: "$global",
+    children: {
+      orderTab: {
+        type: "orderTab",
         options: {
           username: "${root.userinfo.name}",
         },
       },
       orderAdd: {
         type: "orderAdd",
+        scope: "$orderAdd",
         options: {
           username: "${root.userinfo.name}",
         },
@@ -35,27 +37,39 @@ let configs = [
             {
               title: "工单列表",
               key: "list",
-              url: "/list",
+              url: "/product/acl/list",
             },
             {
               title: "新增工单",
               key: "order-add",
-              url: "/add",
+              url: "/product/acl/add",
             },
           ],
         },
       ],
       routers: [
         {
-          path: "/list",
-          component: "@orderList",
+          path: "/product/acl/list",
+          component: "@orderTab",
         },
         {
-          path: "/add",
+          path: "/product/acl/add",
           component: "@orderAdd",
         },
       ],
-      redirect: "/list",
+      redirect: "/product/acl/list",
+    },
+  },
+  {
+    type: "micloud-ajax",
+    scope: "$data",
+    name: "getgroup",
+    options: {
+      url: "/api/service/v1/netacl/staging/api/v1/user/groupname",
+      params: {
+        username: "${$global.root.userinfo.name}",
+      },
+      immediate: "${$global.root.userinfo && $global.root.userinfo.name}",
     },
   },
 ];

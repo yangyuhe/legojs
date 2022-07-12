@@ -30,9 +30,9 @@ export function ModuleTreePanel(props: Props) {
         key: item.id,
         children: [],
       };
-      if (item.refs) {
-        for (let key in item.refs) {
-          let config = item.refs[key];
+      if (item.children) {
+        for (let key in item.children) {
+          let config = item.children[key];
           let child = {
             title: key,
             key: item.id + "-" + key,
@@ -72,7 +72,6 @@ export function ModuleTreePanel(props: Props) {
     }
   };
   const mouseEnter = (evt) => {
-    debugger;
     devContext.postMessage({
       type: "lego_tree_focus",
       value: evt.node.key,

@@ -1,10 +1,11 @@
 export interface ModuleConfig {
   type: string;
   name?: string;
-  triggers?: { [key: string]: string };
+  triggers?: { [key: string]: string | [string, Function] };
   options?: any;
-  refs?: { [name: string]: ModuleConfig[] };
+  children?: { [name: string]: ModuleConfig[] };
   id?: string;
+  scope?: string;
 }
 export interface LegoComponent {
   type: string;

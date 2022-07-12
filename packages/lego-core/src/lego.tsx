@@ -13,7 +13,7 @@ export function Lego(props: { configs: ModuleConfig[] }) {
   return (
     <Provider store={store}>
       {configs.map((item, index) => {
-        let Com = GetComponent(item, "", index);
+        let Com = GetComponent(item, item.scope || "");
         return <Com key={item.name || index}></Com>;
       })}
     </Provider>

@@ -30,7 +30,7 @@ export function Console() {
         cur = configs[+paths[0]];
       } else {
         if (cur instanceof Array) cur = cur[paths[i]];
-        else cur = cur.refs[paths[i]];
+        else cur = cur.children[paths[i]];
       }
     }
     if (cur.type) {

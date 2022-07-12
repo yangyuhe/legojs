@@ -1,27 +1,64 @@
 import { createStore } from "redux";
 const reducer = (state, action) => {
   if (!state) return {};
+  let scope, variable, name, value;
   switch (action.type) {
     case "change":
-      let { scope, name, value } = action.payload;
-      let paths = scope.split(".");
-      paths.push(name);
-      let newState = getNew(state, paths, value);
-      console.log(newState);
-      return newState;
+      scope = action.payload.scope;
+      variable = action.payload.variable;
+      name = action.payload.name;
+      value = action.payload.value;
+      if (scope) {
+        if (variable)
+          return {
+            ...state,
+            [scope]: {
+              ...state[scope],
+              [variable]: {
+                ...(state[scope] && state[scope][variable]),
+                [name]: value,
+              },
+            },
+          };
+        else
+          return {
+            ...state,
+            [scope]: {
+              ...state[scope],
+              [name]: value,
+            },
+          };
+      } else {
+        if (variable)
+          return {
+            ...state,
+            [variable]: {
+              ...state[variable],
+              [name]: value,
+            },
+          };
+        else
+          return {
+            ...state,
+            [name]: value,
+          };
+      }
+      break;
+    case "initVariable":
+      scope = action.payload.scope;
+      variable = action.payload.variable;
+      return {
+        ...state,
+        [scope]: {
+          ...state[scope],
+          [variable]: {},
+        },
+      };
+
     default:
       return state;
   }
 };
-function getNew(state, paths: string[], value) {
-  if (paths.length == 1) {
-    return { ...state, [paths[0]]: value };
-  }
-  let copy = { ...state };
-  let top = paths.shift();
-  copy[top] = getNew(copy[top], paths, value);
-  return copy;
-}
 
 const store = createStore(
   reducer,

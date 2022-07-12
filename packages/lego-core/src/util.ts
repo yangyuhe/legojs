@@ -14,7 +14,7 @@ function withStatement(context, express) {
 export function evalOptions(
   obj: any,
   expValues: { [exp: string]: any },
-  refs: { [name: string]: any }
+  children: { [name: string]: any }
 ): any {
   let exps = Object.keys(expValues);
   if (isObject(obj)) {
@@ -27,15 +27,15 @@ export function evalOptions(
         }
         if (obj[key].startsWith("@")) {
           let ref = obj[key].slice(1);
-          if (refs[ref]) {
-            res[key] = refs[ref];
+          if (children[ref]) {
+            res[key] = children[ref];
             continue;
           }
         }
         res[key] = obj[key];
         continue;
       }
-      res[key] = evalOptions(obj[key], expValues, refs);
+      res[key] = evalOptions(obj[key], expValues, children);
     }
     return res;
   }
@@ -49,14 +49,14 @@ export function evalOptions(
         }
         if (item.startsWith("@")) {
           let ref = item.slice(1);
-          if (refs[ref]) {
-            res.push(refs[ref]);
+          if (children[ref]) {
+            res.push(children[ref]);
             return;
           }
         }
         res.push(item);
       } else {
-        res.push(evalOptions(item, expValues, refs));
+        res.push(evalOptions(item, expValues, children));
       }
     });
     return res;
@@ -65,29 +65,18 @@ export function evalOptions(
 }
 export function evalExpression(expression: string, context: any) {
   let res;
-  if ((res = expression.match(/^\${([^}]+)}$/))) {
+  if ((res = expression.match(/^\${(.+)}$/))) {
     return withStatement(context, res[1]);
   } else {
-    let variables = expression.match(/\${[^}]+}/g);
-    if (variables) {
-      let litrals = expression.split(/\${[^}]+}/);
-      let res = "";
-      for (let i = 0; i < variables.length; i++) {
-        let name = variables[i].substring(2, variables[i].length - 1);
-        res = res + litrals[i] + withStatement(context, name);
-      }
-      res = res + litrals[litrals.length - 1];
-      return res;
-    }
+    return expression;
   }
-  return expression;
 }
 export function getDependancyFields(obj): string[] {
   let depends: string[] = [];
   if (isObject(obj)) {
     for (let key in obj) {
       if (typeof obj[key] == "string") {
-        let reg = /\${([^}]+)}/g;
+        let reg = /^\${(.+)}$/g;
         if (reg.test(obj[key])) {
           depends.push(obj[key]);
         }
@@ -101,7 +90,7 @@ export function getDependancyFields(obj): string[] {
   if (isArray(obj)) {
     obj.forEach((item) => {
       if (typeof item == "string") {
-        let reg = /\${([^}]+)}/g;
+        let reg = /^\${(.+)}$/g;
         if (reg.test(item)) {
           depends.push(item);
         }
@@ -123,12 +112,12 @@ export function isArray(obj) {
 export function transformArray(configs: ModuleConfig[]) {
   if (!Array.isArray(configs)) configs = [configs];
   configs.forEach((config) => {
-    if (config.refs) {
-      Object.keys(config.refs).forEach((key) => {
-        if (!Array.isArray(config.refs[key])) {
-          config.refs[key] = [config.refs[key] as any];
+    if (config.children) {
+      Object.keys(config.children).forEach((key) => {
+        if (!Array.isArray(config.children[key])) {
+          config.children[key] = [config.children[key] as any];
         }
-        config.refs[key] = transformArray(config.refs[key]);
+        config.children[key] = transformArray(config.children[key]);
       });
     }
   });

@@ -88,13 +88,6 @@ const config = {
           excludePath: "/fusion-cloud-website/react/",
           to: "http://127.0.0.1:3001/",
         },
-        {
-          from: function (url) {
-            if (url.indexOf("/api/v1") > -1) return true;
-            return false;
-          },
-          to: "http://test.acl.sys.srv/",
-        },
       ],
     }),
   ],
