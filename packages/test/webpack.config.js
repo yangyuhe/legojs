@@ -79,6 +79,7 @@ const config = {
 const compiler = webpack(config);
 const webpackdev = new WebpackDevServer(compiler, {
   hot: true,
+  open: true,
 });
 webpackdev.listen(3008);
 
